@@ -11,6 +11,12 @@ let products_cget_endpoint = "products";
 let persons_cget_endpoint = "persons";
 let entities_cget_endpoint = "entities";
 
+let product_delete_endpoint = "products/";
+let person_delete_endpoint = "persons/";
+let entity_delete_endpoint = "entities/";
+
+
+
 function onLoad(){
 	fetchDataSource();
 	getForm().addEventListener('submit', (e)=>e.preventDefault());
@@ -18,6 +24,7 @@ function onLoad(){
 		console.log("getLogged es: " + getLogged());
 		getForm().style.display = "none";
 		document.getElementById("btn_logout").style.display = "contents";
+		fetchElementsFromAPI()
 		showDeleteAndCreateButton();
 	}
 	document.getElementById("btn_logout").addEventListener('submit', (e) =>e.preventDefault());
@@ -28,6 +35,10 @@ function onLoad(){
 		}
 			
 	}
+	addButtonEventListener()
+}
+
+function addButtonEventListener(){
 	for(let links of document.getElementsByTagName("a")){
 		links.addEventListener("click", clickedEvent);
 	}
@@ -50,13 +61,40 @@ var data = JSON.parse(window.localStorage.getItem("data"));
 
 var idOfElementToDelete = this.getAttribute("name");
 var objectOfElementToDelete = data.filter(objeto => objeto.id == idOfElementToDelete);
-var nombre = objectOfElementToDelete[0].nombre;
-var newData = data.filter(objeto => objeto.id != idOfElementToDelete);
-data = newData;
-console.log("Elementos restantes: " + newData);
-window.localStorage.setItem("data", JSON.stringify(newData));
-window.location.reload();
-alert(nombre + " eliminado");
+if(objectOfElementToDelete.length != 0){
+	var nombre = objectOfElementToDelete[0].nombre;
+	var newData = data.filter(objeto => objeto.id != idOfElementToDelete);
+	data = newData;
+	console.log("Elementos restantes: " + newData);
+	window.localStorage.setItem("data", JSON.stringify(newData));
+	alert(nombre + " eliminado");
+	window.location.reload();
+} else {
+	deleteElementFromAPI(this.name, this.value);
+}
+}
+
+function deleteElementFromAPI(id, type){
+	switch(type){
+		case "product": request(api_url, product_delete_endpoint+id, responseDeleteFromAPI, "DELETE", undefined);
+		break;
+		case "person": request(api_url, person_delete_endpoint+id, responseDeleteFromAPI, "DELETE",undefined);
+		break;
+		case "entity": request(api_url, entity_delete_endpoint+id, responseDeleteFromAPI, "DELETE", undefined);
+		break;
+	}
+}
+
+function responseDeleteFromAPI(){
+	if(httpRequest.status === 204){
+		alert("Product deleted");
+		window.location.reload();
+	} else if(httpRequest.status === 401){
+		alert("UNAUTHORIZED: invalid Authorization header");
+	} else {
+		let error = httpRequest.response;
+		alert(error);
+	}
 }
 
 function editClicked(){
@@ -139,6 +177,7 @@ function getLogged(){
 function destroyLogged(){
 window.localStorage.removeItem("userLogged");
 window.localStorage.removeItem("jwt");
+window.location.reload();
 }
 function getForm() { return document.forms["login_form"] }
 
@@ -176,7 +215,6 @@ function successLogin(){
 	payLoad.scopes.forEach((scope) => {
 		scopes += scope + " ";
 	});
-	console.log(scopes);
 	window.localStorage.setItem("jwt", jwt);
 	saveLogged(email, pass, scopes);
 	getForm()["username"].value= "";
@@ -272,8 +310,7 @@ function showElementsFromAPI(){
 			break;
 		}
 		showDeleteAndCreateButton();
-	} else {
-		alert("No hay conexión");
+		addButtonEventListener();
 	}
 }
 
@@ -300,7 +337,7 @@ function showElements(item){
 
 
 
-		var divCol = document.createElement("div");
+	var divCol = document.createElement("div");
 	divCol.classList.toggle("col");
 	var divThumbnail = document.createElement("div");
 	divThumbnail.classList.toggle("thumbnail")
@@ -316,6 +353,7 @@ function showElements(item){
 	a.classList.toggle("fs-6");
 	a.setAttribute('href', "detail.html");
 	a.setAttribute('target', "_blank");
+
 	var button = document.createElement("button");
 	button.setAttribute("type", "submit");
 	button.classList.toggle("btn");
@@ -339,7 +377,9 @@ function showElements(item){
 	divThumbnail.appendChild(aEdit);
 	divCol.appendChild(divThumbnail);
 		button.setAttribute("name", item.id);
+		button.setAttribute("value", item.type);
 		buttonEditar.setAttribute("name", item.id);
+		buttonEditar.setAttribute("value", item.type);
 		a.setAttribute("id", item.id);
 		a.setAttribute("title", item.name);
 		a.innerHTML = item.name;
@@ -352,7 +392,7 @@ function showElements(item){
 			break;
 			default: entity_col.appendChild(divCol);
 		}
-}
+	}
 
 //Users
 let user1 = {
