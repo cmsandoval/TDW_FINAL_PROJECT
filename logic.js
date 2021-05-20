@@ -50,10 +50,7 @@ function addButtonEventListener(){
 	}
 }
 
-function clickedEvent(event){
-console.log(this.id);
-saveLinkClicked(this.id);
-}
+
 
 function deleteClicked(){
 console.log(this.getAttribute("name") + "se quiere eliminar");
@@ -109,17 +106,14 @@ var data = JSON.parse(window.localStorage.getItem("data"));
 	});
 }
 
-function saveLinkClicked(id){
-	var data = JSON.parse(window.localStorage.getItem("data"));
-	data.forEach((item) => {
-		if(id == item.id){
-			//Save selected item
-			let itemClicked = JSON.stringify(item);
-			console.log(itemClicked);
-			window.localStorage.setItem("selected", itemClicked);
-		}
-	});
-}
+function clickedEvent(){
+	console.log(this.attributes[5].nodeValue);
+	var itemSelected = {
+		id: this.id,
+		type: this.attributes[5].nodeValue
+	};
+	window.localStorage.setItem("itemSelected", JSON.stringify(itemSelected));
+	}
 
 
 function logout(event, button) {
@@ -382,6 +376,7 @@ function showElements(item){
 		buttonEditar.setAttribute("value", item.type);
 		a.setAttribute("id", item.id);
 		a.setAttribute("title", item.name);
+		a.setAttribute("value", item.type);
 		a.innerHTML = item.name;
 		img.setAttribute("alt", item.name);
 		img.setAttribute("src", item.imageUrl);
