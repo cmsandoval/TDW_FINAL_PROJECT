@@ -95,15 +95,14 @@ function responseDeleteFromAPI(){
 }
 
 function editClicked(){
-var data = JSON.parse(window.localStorage.getItem("data"));
-	data.forEach((item) => {
-		if(this.getAttribute("name") == item.id){
-			//Save selected item
-			let itemClicked = JSON.stringify(item);
-			console.log(itemClicked);
-			window.localStorage.setItem("selected", itemClicked);
-		}
-	});
+	console.log(this.value);
+	var itemSelected = {
+		id: this.name,
+		type: this.value
+	};
+	window.localStorage.setItem("itemToEdit", JSON.stringify(itemSelected));
+
+
 }
 
 function clickedEvent(){
@@ -414,8 +413,8 @@ let ibm = {
 	deathDate:"12 de agosto de 1981",
 	imageUrl: "images/ic_ibm.svg",
 	wikiUrl: "https://es.wikipedia.org/wiki/IBM",
-	creadores: ["",""],
-	patrocinadores: ["",""],
+	persons: ["",""],
+	entities: ["",""],
 	type: "entity"
 };
 
@@ -426,8 +425,8 @@ let sgml = {
 	deathDate:"1998",
 	imageUrl: "images/ic_sgml.png",
 	wikiUrl: "https://es.wikipedia.org/wiki/SGML#:~:text=El%20lenguaje%20de%20marcado%20generalizado,de%20marcado%20generalizados%20para%20documentos.",
-	creadores: ["Charles Goldfarb","Edward Mosher", "Raymond Lorie"],
-	patrocinadores: ["IBM"],
+	persons: ["Charles Goldfarb","Edward Mosher", "Raymond Lorie"],
+	entities: ["IBM"],
 	type: "product"
 };
 

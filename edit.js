@@ -1,9 +1,13 @@
-let itemSelected;
 var typetxt ="";
+let api_url = "http://127.0.0.1:8000/api/v1/";
+let httpRequest =
+        new XMLHttpRequest();
+let products_path = "products/";
+let persons_path = "persons/";
+let entities_path = "entities/";
 
 function onLoad(){
 	getSelectedItem();
-	setData();
 	document.getElementById("btn_edit").addEventListener("click", editClicked);
 	for(let radioOption of document.getElementsByName("RadioOptions")){
 		radioOption.addEventListener("click", clickRadio);
@@ -11,43 +15,99 @@ function onLoad(){
 }
 
 function getSelectedItem(){
-	var stringItemSelected = window.localStorage.getItem("selected");
-	itemSelected = JSON.parse(stringItemSelected);
+	var item = JSON.parse(window.localStorage.getItem("itemToEdit"));
+	var isFromCache = setItemFromCache(item.id);
+	if(!isFromCache){
+		fetchItemFromApi(item.id, item.type);
+	}
 }
 
-function setData(){
-	document.getElementById("nombre_input").value = itemSelected.nombre;
+function fetchItemFromApi(id, type){
+	switch(type){
+		case "product": request(products_path+id, response, "GET", undefined);
+		break;
+		case "person": request(persons_path+id, response, "GET",undefined);
+		break;
+		case "entity": request(entities_path+id, response, "GET", undefined);
+		break;
+	}
+}
+
+function request(endpoint, response, method, params){
+	httpRequest.open(method,encodeURI(api_url+endpoint), true);
+	httpRequest.responseType = "json";
+	httpRequest.onload = response;
+	let jwt = window.localStorage.getItem("jwt");
+	if(jwt != null){
+		httpRequest.setRequestHeader('Authorization', "Bearer " + jwt);
+	}
+	if(params === undefined){
+		httpRequest.send();
+	} else {
+		httpRequest.send(params);
+	}
+}
+
+function response(){
+	if(httpRequest.status === 200){
+		var response = httpRequest.response.product;
+		console.log(response);
+		setData(response);
+	} else if(httpRequest.status === 401){
+		alert("UNAUTHORIZED: invalid Authorization header");
+	} else {
+		let error = httpRequest.response;
+		alert(error);
+	}
+}
+
+function setItemFromCache(id){
+	var isInCache =  false;
+	var data = JSON.parse(window.localStorage.getItem("data"));
+	data.forEach((item) => {
+		if(id == item.id){
+			isInCache = true;
+			console.log(item);
+			setData(item);
+		}
+	});
+	return isInCache;
+
+}
+
+function setData(item){
+	document.getElementById("nombre_input").value = item.name;
 	var apellido = "";
-	if(typeof itemSelected.apellido !== "undefined"){
-		apellido = itemSelected.apellido;
+	if(typeof item.apellido !== "undefined"){
+		apellido = item.apellido;
 	}
 	document.getElementById("apellido_input").value = apellido;
-	document.getElementById("fecha_nac_input").value = itemSelected.fechaCreacion;
-	document.getElementById("fecha_def_input").value = itemSelected.fechaDefuncion;
+	document.getElementById("fecha_nac_input").value = item.birthDate;
+	document.getElementById("fecha_def_input").value = item.deathDate;
 	var creadores = "";
-	if(typeof itemSelected.creadores !== "undefined"){
-		itemSelected.creadores.forEach((creador) =>{
+	if(item.persons != null){
+		item.persons.forEach((creador) =>{
 			creadores = creadores + creador + " ";
 		});
 	}
 	document.getElementById("participes").value = creadores;
 
 	var patrocinadores = "";
-	if(typeof itemSelected.patrocinadores !== "undefined"){
-		itemSelected.patrocinadores.forEach((patrocinador) =>{
+	if(item.entities != null){
+		item.entities.forEach((patrocinador) =>{
 			patrocinadores = patrocinadores + patrocinador + " ";
 		});
 	}
 
 	document.getElementById("patrocinadores").value = patrocinadores;
-	document.getElementById("wiki").value = itemSelected.wiki;
-	document.getElementById("url_Image").value = itemSelected.imagen;
+	document.getElementById("wiki").value = item.wikiUrl;
+	document.getElementById("url_Image").value = item.imageUrl;
 
-	setRadio();
+	setRadio(item);
 }
 
-function setRadio(){
-	switch(itemSelected.type){
+function setRadio(item){
+	switch(item.type){
 		case "entity": {document.getElementById("entity_checkbox").checked = true;break;}
 		case "product": {document.getElementById("product_checkbox").checked = true;break;}
 		default : document.getElementById("person_checkbox").checked = true;
@@ -56,18 +116,28 @@ function setRadio(){
 
 function editClicked(){
 	var data = JSON.parse(window.localStorage.getItem("data"));
+	var item = JSON.parse(window.localStorage.getItem("itemToEdit"));
 
-var idOfElementToEdit = itemSelected.id;
-var objectOfElementToEdit = data.filter(objeto => objeto.id == idOfElementToEdit);
-var nombre = objectOfElementToEdit[0].nombre;
-var newData = data.filter(objeto => objeto.id != idOfElementToEdit);
-data = newData;
-objetoEditado = getDataInJSON();
-data.push(objetoEditado);
-console.log("Elementos resultado: " + data);
-window.localStorage.setItem("data", JSON.stringify(newData));
-window.location.reload();
-alert(nombre + " editado");
+var idOfElementToEdit = item.id;
+var objectOfElementToEditFromCache = data.filter(objeto => objeto.id == idOfElementToEdit);
+if(objectOfElementToEditFromCache.length > 0){
+	var nombre = objectOfElementToEditFromCache[0].nombre;
+	var newData = data.filter(objeto => objeto.id != idOfElementToEdit);
+	data = newData;
+	objetoEditado = getDataInJSON();
+	data.push(objetoEditado);
+	console.log("Elementos resultado: " + data);
+	window.localStorage.setItem("data", JSON.stringify(newData));
+	window.location.reload();
+	alert(nombre + " editado");
+} else {
+	updateAPIService(item);
+}
+
+}
+
+function updateAPIService(item){
+	
 }
 
 function clickRadio(){
@@ -119,7 +189,7 @@ function getDataInJSON(){
 
 function getApellido() {
 	var resul = document.getElementById("apellido_input").value;
-	if(typeof resul !== "undefined"){
+	if(resul !== undefined){
 		return resul;
 	} else {
 		return "";
