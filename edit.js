@@ -5,6 +5,8 @@ let httpRequest =
 let products_path = "products/";
 let persons_path = "persons/";
 let entities_path = "entities/";
+let etag;
+let currentItem;
 
 function onLoad(){
 	getSelectedItem();
@@ -15,10 +17,10 @@ function onLoad(){
 }
 
 function getSelectedItem(){
-	var item = JSON.parse(window.localStorage.getItem("itemToEdit"));
-	var isFromCache = setItemFromCache(item.id);
+	currentItem = JSON.parse(window.localStorage.getItem("itemToEdit"));
+	var isFromCache = setItemFromCache(currentItem.id);
 	if(!isFromCache){
-		fetchItemFromApi(item.id, item.type);
+		fetchItemFromApi(currentItem.id, currentItem.type);
 	}
 }
 
@@ -50,8 +52,17 @@ function request(endpoint, response, method, params){
 
 function response(){
 	if(httpRequest.status === 200){
-		var response = httpRequest.response.product;
-		console.log(response);
+		let response;
+		switch(currentItem.type){
+			case "product": response = httpRequest.response.product;
+			break;
+			case "person": response = httpRequest.response.person;
+			break;
+			case "entity": response = httpRequest.response.entity;
+			break;
+		}
+		etag = httpRequest.getResponseHeader('ETag')
+		console.log(etag);
 		setData(response);
 	} else if(httpRequest.status === 401){
 		alert("UNAUTHORIZED: invalid Authorization header");
@@ -81,7 +92,7 @@ function setData(item){
 	if(typeof item.apellido !== "undefined"){
 		apellido = item.apellido;
 	}
-	document.getElementById("apellido_input").value = apellido;
+	document.getElementById("apellido_input").value = 'apellido';
 	document.getElementById("fecha_nac_input").value = item.birthDate;
 	document.getElementById("fecha_def_input").value = item.deathDate;
 	var creadores = "";
@@ -103,14 +114,23 @@ function setData(item){
 	document.getElementById("wiki").value = item.wikiUrl;
 	document.getElementById("url_Image").value = item.imageUrl;
 
-	setRadio(item);
+	setRadio();
 }
 
-function setRadio(item){
-	switch(item.type){
-		case "entity": {document.getElementById("entity_checkbox").checked = true;break;}
-		case "product": {document.getElementById("product_checkbox").checked = true;break;}
-		default : document.getElementById("person_checkbox").checked = true;
+function setRadio(){
+	switch(currentItem.type){
+		case "entity": {
+			typetxt = "entity";
+			document.getElementById("entity_checkbox").checked = true;
+			break;}
+		case "product": {
+			typetxt = "product";
+			document.getElementById("product_checkbox").checked = true;
+			break;}
+		default : {
+			typetxt= "person";
+			document.getElementById("person_checkbox").checked = true;
+		}
 	}
 }
 
@@ -120,24 +140,43 @@ function editClicked(){
 
 var idOfElementToEdit = item.id;
 var objectOfElementToEditFromCache = data.filter(objeto => objeto.id == idOfElementToEdit);
+var assetEdited = getDataInJSON();
+
 if(objectOfElementToEditFromCache.length > 0){
 	var nombre = objectOfElementToEditFromCache[0].nombre;
 	var newData = data.filter(objeto => objeto.id != idOfElementToEdit);
 	data = newData;
-	objetoEditado = getDataInJSON();
-	data.push(objetoEditado);
+	data.push(assetEdited);
 	console.log("Elementos resultado: " + data);
 	window.localStorage.setItem("data", JSON.stringify(newData));
 	window.location.reload();
 	alert(nombre + " editado");
 } else {
-	updateAPIService(item);
+	updateAPIService(assetEdited, idOfElementToEdit);
 }
 
 }
 
-function updateAPIService(item){
-	
+function updateAPIService(assetEdited, idOfElementToEdit){
+	let jwt = window.localStorage.getItem("jwt");
+	fetch(api_url+assetEdited.type+"/"+idOfElementToEdit, {
+		method: 'PUT',
+		data: assetEdited,
+		headers:{
+			'Content-Type': 'application/json',
+			'Accept-Encoding': 'gzip, deflate, br',
+			'Authorization': jwt,
+			/*'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Headers': '*',
+			'Access-Control-Allow-Credentials': true,
+			'Access-Control-Allow-Methods': 'GET,DELETE,OPTIONS,PUT',
+			'Access-Control-Expose-Headers': '*',*/
+			'If-Match': etag
+		  }
+	}).then(res => console.log(res.json()))
+	.catch(error => console.error('Error:', error))
+	.then(response => console.log('Success:', response));
+	//requestPUT(products_path+idOfElementToEdit,response, "PUT", undefined);
 }
 
 function clickRadio(){
