@@ -36,11 +36,14 @@ function onLoad() {
 
 	}
 	addButtonEventListener()
+
 }
 
 function addButtonEventListener() {
 	for (let links of document.getElementsByTagName("a")) {
-		links.addEventListener("click", clickedEvent);
+		if(links.name != "modal"){
+			links.addEventListener("click", clickedEvent);
+		}
 	}
 	for (let deleteButton of document.getElementsByClassName("btn-danger")) {
 		deleteButton.addEventListener("click", deleteClicked);
@@ -49,8 +52,6 @@ function addButtonEventListener() {
 		editButton.addEventListener("click", editClicked);
 	}
 }
-
-
 
 function deleteClicked() {
 	console.log(this.getAttribute("name") + "se quiere eliminar");
@@ -397,6 +398,10 @@ function openNav() {
 function closeNav() {
 	document.getElementById("mySidenav").style.width = "0";
 	document.getElementById("main").style.marginLeft = "0";
+}
+
+function checkUserName(){
+	
 }
 
 //Users
