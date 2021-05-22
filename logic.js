@@ -2,11 +2,11 @@
 let access_url = "http://127.0.0.1:8000/";
 let api_url = "http://127.0.0.1:8000/api/v1/";
 let httpRequest =
-        new XMLHttpRequest();
+	new XMLHttpRequest();
 let httpRequest1 =
-        new XMLHttpRequest();
+	new XMLHttpRequest();
 let httpRequest2 =
-        new XMLHttpRequest();
+	new XMLHttpRequest();
 let products_cget_endpoint = "products";
 let persons_cget_endpoint = "persons";
 let entities_cget_endpoint = "entities";
@@ -17,76 +17,76 @@ let entity_delete_endpoint = "entities/";
 
 
 
-function onLoad(){
+function onLoad() {
 	fetchDataSource();
-	getForm().addEventListener('submit', (e)=>e.preventDefault());
-	if(getLogged()){
+	getForm().addEventListener('submit', (e) => e.preventDefault());
+	if (getLogged()) {
 		console.log("getLogged es: " + getLogged());
 		getForm().style.display = "none";
 		document.getElementById("btn_logout").style.display = "contents";
 		fetchElementsFromAPI()
 		showDeleteAndCreateButton();
 	}
-	document.getElementById("btn_logout").addEventListener('submit', (e) =>e.preventDefault());
-	for(let form of document.getElementsByTagName("form")){
-		for(let element of form){
-			if(element.value == "Sign in")
+	document.getElementById("btn_logout").addEventListener('submit', (e) => e.preventDefault());
+	for (let form of document.getElementsByTagName("form")) {
+		for (let element of form) {
+			if (element.value == "Sign in")
 				element.addEventListener("click", doLogin);
 		}
-			
+
 	}
 	addButtonEventListener()
 }
 
-function addButtonEventListener(){
-	for(let links of document.getElementsByTagName("a")){
+function addButtonEventListener() {
+	for (let links of document.getElementsByTagName("a")) {
 		links.addEventListener("click", clickedEvent);
 	}
-	for(let deleteButton of document.getElementsByClassName("btn-danger")){
+	for (let deleteButton of document.getElementsByClassName("btn-danger")) {
 		deleteButton.addEventListener("click", deleteClicked);
 	}
-	for(let editButton of document.getElementsByClassName("btn-warning")){
+	for (let editButton of document.getElementsByClassName("btn-warning")) {
 		editButton.addEventListener("click", editClicked);
 	}
 }
 
 
 
-function deleteClicked(){
-console.log(this.getAttribute("name") + "se quiere eliminar");
-var data = JSON.parse(window.localStorage.getItem("data"));
+function deleteClicked() {
+	console.log(this.getAttribute("name") + "se quiere eliminar");
+	var data = JSON.parse(window.localStorage.getItem("data"));
 
-var idOfElementToDelete = this.getAttribute("name");
-var objectOfElementToDelete = data.filter(objeto => objeto.id == idOfElementToDelete);
-if(objectOfElementToDelete.length != 0){
-	var nombre = objectOfElementToDelete[0].nombre;
-	var newData = data.filter(objeto => objeto.id != idOfElementToDelete);
-	data = newData;
-	console.log("Elementos restantes: " + newData);
-	window.localStorage.setItem("data", JSON.stringify(newData));
-	alert(nombre + " deleted");
-	window.location.reload();
-} else {
-	deleteElementFromAPI(this.name, this.value);
-}
-}
-
-function deleteElementFromAPI(id, type){
-	switch(type){
-		case "product": request(api_url, product_delete_endpoint+id, responseDeleteFromAPI, "DELETE", undefined);
-		break;
-		case "person": request(api_url, person_delete_endpoint+id, responseDeleteFromAPI, "DELETE",undefined);
-		break;
-		case "entity": request(api_url, entity_delete_endpoint+id, responseDeleteFromAPI, "DELETE", undefined);
-		break;
+	var idOfElementToDelete = this.getAttribute("name");
+	var objectOfElementToDelete = data.filter(objeto => objeto.id == idOfElementToDelete);
+	if (objectOfElementToDelete.length != 0) {
+		var nombre = objectOfElementToDelete[0].nombre;
+		var newData = data.filter(objeto => objeto.id != idOfElementToDelete);
+		data = newData;
+		console.log("Elementos restantes: " + newData);
+		window.localStorage.setItem("data", JSON.stringify(newData));
+		alert(nombre + " deleted");
+		window.location.reload();
+	} else {
+		deleteElementFromAPI(this.name, this.value);
 	}
 }
 
-function responseDeleteFromAPI(){
-	if(httpRequest.status === 204){
+function deleteElementFromAPI(id, type) {
+	switch (type) {
+		case "product": request(api_url, product_delete_endpoint + id, responseDeleteFromAPI, "DELETE", undefined);
+			break;
+		case "person": request(api_url, person_delete_endpoint + id, responseDeleteFromAPI, "DELETE", undefined);
+			break;
+		case "entity": request(api_url, entity_delete_endpoint + id, responseDeleteFromAPI, "DELETE", undefined);
+			break;
+	}
+}
+
+function responseDeleteFromAPI() {
+	if (httpRequest.status === 204) {
 		alert("Product deleted");
 		window.location.reload();
-	} else if(httpRequest.status === 401){
+	} else if (httpRequest.status === 401) {
 		alert("UNAUTHORIZED: invalid Authorization header");
 	} else {
 		let error = httpRequest.response;
@@ -94,7 +94,7 @@ function responseDeleteFromAPI(){
 	}
 }
 
-function editClicked(){
+function editClicked() {
 	console.log(this.value);
 	var itemSelected = {
 		id: this.name,
@@ -105,72 +105,72 @@ function editClicked(){
 
 }
 
-function clickedEvent(){
+function clickedEvent() {
 	console.log(this.attributes[5].nodeValue);
 	var itemSelected = {
 		id: this.id,
 		type: this.attributes[5].nodeValue
 	};
 	window.localStorage.setItem("itemSelected", JSON.stringify(itemSelected));
-	}
+}
 
 
 function logout(event, button) {
 	var formulario = getForm();
-	formulario.style.display="contents";
+	formulario.style.display = "contents";
 	hideLogoutAndCreateButton();
-	for(let deleteButton of document.getElementsByClassName("btn-danger")){
+	for (let deleteButton of document.getElementsByClassName("btn-danger")) {
 		deleteButton.style.display = "none";
 	}
-	for(let editButton of document.getElementsByClassName("btn-warning")){
+	for (let editButton of document.getElementsByClassName("btn-warning")) {
 		editButton.style.display = "none";
 	}
 	destroyLogged();
 }
 
 
-function showDeleteAndCreateButton(){
+function showDeleteAndCreateButton() {
 	let data = window.localStorage.getItem("userLogged");
 	let userLogged = JSON.parse(data);
-	if(userLogged.scope.includes('writer')){
-		for(let deleteButton of document.getElementsByClassName("btn-danger")){
+	if (userLogged.scope.includes('writer')) {
+		for (let deleteButton of document.getElementsByClassName("btn-danger")) {
 			deleteButton.style.display = "initial";
 		}
-		for(let editButton of document.getElementsByClassName("btn-warning")){
+		for (let editButton of document.getElementsByClassName("btn-warning")) {
 			editButton.style.display = "initial";
 		}
 		var boton = document.getElementById("btn_create");
 		boton.style.display = "initial";
-		console.log("boton esta "+boton.style.display);
+		console.log("boton esta " + boton.style.display);
 	}
 }
 
-function hideLogoutAndCreateButton(){
+function hideLogoutAndCreateButton() {
 	document.getElementById("btn_logout").style.display = "none";
 	document.getElementById("btn_create").style.display = "none";
 }
 
-function saveLogged(email, pass, scopes){
+function saveLogged(email, pass, scopes) {
 	var userData = JSON.stringify({
 		"email": email,
-		"pass" : pass,
+		"pass": pass,
 		"scope": scopes
 	});
 	window.localStorage.setItem("userLogged", userData);
 }
 
-function getLogged(){
+function getLogged() {
 	let isLogged = false;
 	let data = window.localStorage.getItem("userLogged");
-	if(data != null)
+	if (data != null)
 		isLogged = true;
 	return isLogged;
 }
 
-function destroyLogged(){
-window.localStorage.removeItem("userLogged");
-window.localStorage.removeItem("jwt");
-window.location.reload();
+function destroyLogged() {
+	window.localStorage.removeItem("userLogged");
+	window.localStorage.removeItem("jwt");
+	window.location.reload();
 }
 function getForm() { return document.forms["login_form"] }
 
@@ -185,10 +185,10 @@ function doLogin() {
 	request(access_url, "access_token", checkLoginStatus, "POST", formData);
 }
 
-function checkLoginStatus(){
-	if(httpRequest.status === 200){
+function checkLoginStatus() {
+	if (httpRequest.status === 200) {
 		successLogin();
-	} else if(httpRequest.status === 401){
+	} else if (httpRequest.status === 401) {
 		alert("UNAUTHORIZED: invalid Authorization header");
 	} else {
 		let error = httpRequest.response;
@@ -196,7 +196,7 @@ function checkLoginStatus(){
 	}
 }
 
-function successLogin(){
+function successLogin() {
 	var email = getForm()["username"].value;
 	var pass = getForm()["password"].value;
 	var response = httpRequest.response;
@@ -210,7 +210,7 @@ function successLogin(){
 	});
 	window.localStorage.setItem("jwt", jwt);
 	saveLogged(email, pass, scopes);
-	getForm()["username"].value= "";
+	getForm()["username"].value = "";
 	getForm()["password"].value = "";
 	getForm().style.display = "none";
 	document.getElementById("btn_logout").style.display = "contents";
@@ -218,98 +218,98 @@ function successLogin(){
 	showDeleteAndCreateButton();
 }
 
-function request(url, endpoint, response, method, params){
-	httpRequest.open(method,encodeURI(url+endpoint), true);
+function request(url, endpoint, response, method, params) {
+	httpRequest.open(method, encodeURI(url + endpoint), true);
 	httpRequest.responseType = "json";
 	httpRequest.onload = response;
 	let jwt = window.localStorage.getItem("jwt");
-	if(jwt != null){
+	if (jwt != null) {
 		httpRequest.setRequestHeader('Authorization', "Bearer " + jwt);
 	}
-	if(params === undefined){
+	if (params === undefined) {
 		httpRequest.send();
 	} else {
 		httpRequest.send(params);
 	}
 }
 
-function requestAux1(url, endpoint, response, method, params){
-	httpRequest1.open(method,encodeURI(url+endpoint), true);
+function requestAux1(url, endpoint, response, method, params) {
+	httpRequest1.open(method, encodeURI(url + endpoint), true);
 	httpRequest1.responseType = "json";
 	httpRequest1.onload = response;
 	let jwt = window.localStorage.getItem("jwt");
-	if(jwt != null){
+	if (jwt != null) {
 		httpRequest1.setRequestHeader('Authorization', "Bearer " + jwt);
 	}
-	if(params === undefined){
+	if (params === undefined) {
 		httpRequest1.send();
 	} else {
 		httpRequest1.send(params);
 	}
 }
 
-function requestAux2(url, endpoint, response, method, params){
-	httpRequest2.open(method,encodeURI(url+endpoint), true);
+function requestAux2(url, endpoint, response, method, params) {
+	httpRequest2.open(method, encodeURI(url + endpoint), true);
 	httpRequest2.responseType = "json";
 	httpRequest2.onload = response;
 	let jwt = window.localStorage.getItem("jwt");
-	if(jwt != null){
+	if (jwt != null) {
 		httpRequest2.setRequestHeader('Authorization', "Bearer " + jwt);
 	}
-	if(params === undefined){
+	if (params === undefined) {
 		httpRequest2.send();
 	} else {
 		httpRequest2.send(params);
 	}
 }
 
-function fetchElementsFromAPI(){
-		request(api_url, products_cget_endpoint, showElementsFromAPI, "GET", undefined);
-		requestAux1(api_url, persons_cget_endpoint, showElementsFromAPI, "GET", undefined);
-		requestAux2(api_url, entities_cget_endpoint, showElementsFromAPI, "GET", undefined);
+function fetchElementsFromAPI() {
+	request(api_url, products_cget_endpoint, showElementsFromAPI, "GET", undefined);
+	requestAux1(api_url, persons_cget_endpoint, showElementsFromAPI, "GET", undefined);
+	requestAux2(api_url, entities_cget_endpoint, showElementsFromAPI, "GET", undefined);
 
 }
 
-function showElementsFromAPI(){
-	if (this.status === 200){
+function showElementsFromAPI() {
+	if (this.status === 200) {
 		var response = this.response;
-		switch(this.responseURL){
-			case api_url+products_cget_endpoint: {
-					response.products.forEach((object) => {
+		switch (this.responseURL) {
+			case api_url + products_cget_endpoint: {
+				response.products.forEach((object) => {
 					var product = object.product;
 					product.type = "product";
 					console.log(product);
 					showElements(product);
-			});
+				});
 			}
-			break;
-			case api_url+persons_cget_endpoint: {
+				break;
+			case api_url + persons_cget_endpoint: {
 				response.persons.forEach((object) => {
 					var person = object.person;
 					person.type = "person";
 					console.log(person);
 					showElements(person);
-			});
+				});
 			}
-			break;
-			case api_url+entities_cget_endpoint: {
+				break;
+			case api_url + entities_cget_endpoint: {
 				response.entities.forEach((object) => {
 					var entity = object.entity;
 					entity.type = "entity";
 					console.log(entity);
 					showElements(entity);
-			});
+				});
 			}
-			break;
+				break;
 		}
 		showDeleteAndCreateButton();
 		addButtonEventListener();
 	}
 }
 
-function fetchDataSource(){
+function fetchDataSource() {
 	var currentData = window.localStorage.getItem("data");
-	if(currentData != null){
+	if (currentData != null) {
 		currentData = JSON.parse(currentData);
 		currentData.forEach((item) => {
 			showElements(item);
@@ -322,7 +322,7 @@ function fetchDataSource(){
 	}
 }
 
-function showElements(item){
+function showElements(item) {
 	var product_col = document.getElementById("product_col");
 	var person_col = document.getElementById("person_col");
 	var entity_col = document.getElementById("entity_col");
@@ -369,39 +369,39 @@ function showElements(item){
 	divThumbnail.appendChild(button);
 	divThumbnail.appendChild(aEdit);
 	divCol.appendChild(divThumbnail);
-		button.setAttribute("name", item.id);
-		button.setAttribute("value", item.type);
-		buttonEditar.setAttribute("name", item.id);
-		buttonEditar.setAttribute("value", item.type);
-		a.setAttribute("id", item.id);
-		a.setAttribute("title", item.name);
-		a.setAttribute("value", item.type);
-		a.innerHTML = item.name;
-		img.setAttribute("alt", item.name);
-		img.setAttribute("src", item.imageUrl);
-		switch(item.type){
-			case "product":product_col.appendChild(divCol);
+	button.setAttribute("name", item.id);
+	button.setAttribute("value", item.type);
+	buttonEditar.setAttribute("name", item.id);
+	buttonEditar.setAttribute("value", item.type);
+	a.setAttribute("id", item.id);
+	a.setAttribute("title", item.name);
+	a.setAttribute("value", item.type);
+	a.innerHTML = item.name;
+	img.setAttribute("alt", item.name);
+	img.setAttribute("src", item.imageUrl);
+	switch (item.type) {
+		case "product": product_col.appendChild(divCol);
 			break;
-			case "person":person_col.appendChild(divCol);
+		case "person": person_col.appendChild(divCol);
 			break;
-			default: entity_col.appendChild(divCol);
-		}
+		default: entity_col.appendChild(divCol);
 	}
+}
 
 function openNav() {
 	document.getElementById("mySidenav").style.width = "250px";
 	document.getElementById("main").style.marginLeft = "250px";
-	  }
-	  
-	  /* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
-	  function closeNav() {
-		document.getElementById("mySidenav").style.width = "0";
-		document.getElementById("main").style.marginLeft = "0";
-	  }
+}
+
+/* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
+function closeNav() {
+	document.getElementById("mySidenav").style.width = "0";
+	document.getElementById("main").style.marginLeft = "0";
+}
 
 //Users
 let user1 = {
-	email : "user1@domain.com",
+	email: "user1@domain.com",
 	password: "user1@domain.com"
 };
 
@@ -411,11 +411,11 @@ let ibm = {
 	id: "to_ibm",
 	name: "IBM",
 	birthDate: "16 de Junio de 1911",
-	deathDate:"12 de agosto de 1981",
+	deathDate: "12 de agosto de 1981",
 	imageUrl: "images/ic_ibm.svg",
 	wikiUrl: "https://es.wikipedia.org/wiki/IBM",
-	persons: ["",""],
-	entities: ["",""],
+	persons: ["", ""],
+	entities: ["", ""],
 	type: "entity"
 };
 
@@ -423,10 +423,10 @@ let sgml = {
 	id: "to_sgml",
 	name: "SGML",
 	birthDate: "1960",
-	deathDate:"1998",
+	deathDate: "1998",
 	imageUrl: "images/ic_sgml.png",
 	wikiUrl: "https://es.wikipedia.org/wiki/SGML#:~:text=El%20lenguaje%20de%20marcado%20generalizado,de%20marcado%20generalizados%20para%20documentos.",
-	persons: ["Charles Goldfarb","Edward Mosher", "Raymond Lorie"],
+	persons: ["Charles Goldfarb", "Edward Mosher", "Raymond Lorie"],
 	entities: ["IBM"],
 	type: "product"
 };
@@ -435,7 +435,7 @@ let vannerbar = {
 	id: "to_vannervar",
 	name: "VANNERVAR BUSH",
 	birthDate: "11 de Marzo de 1890",
-	deathDate:"28 de Junio de 1974",
+	deathDate: "28 de Junio de 1974",
 	imageUrl: "images/ic_vannervar.jpg",
 	wikiUrl: "https://es.wikipedia.org/wiki/Vannevar_Bush",
 	type: "person"
