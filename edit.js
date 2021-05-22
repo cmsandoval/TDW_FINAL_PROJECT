@@ -88,11 +88,6 @@ function setItemFromCache(id){
 
 function setData(item){
 	document.getElementById("nombre_input").value = item.name;
-	var apellido = "";
-	if(typeof item.apellido !== "undefined"){
-		apellido = item.apellido;
-	}
-	document.getElementById("apellido_input").value = 'apellido';
 	document.getElementById("fecha_nac_input").value = item.birthDate;
 	document.getElementById("fecha_def_input").value = item.deathDate;
 	var creadores = "";
@@ -159,24 +154,19 @@ if(objectOfElementToEditFromCache.length > 0){
 
 function updateAPIService(assetEdited, idOfElementToEdit){
 	let jwt = window.localStorage.getItem("jwt");
-	fetch(api_url+assetEdited.type+"/"+idOfElementToEdit, {
+	fetch(api_url+assetEdited.type+"s/"+idOfElementToEdit, {
 		method: 'PUT',
-		data: assetEdited,
+		body: JSON.stringify(assetEdited),
 		headers:{
+			'accept': 'application/json',
 			'Content-Type': 'application/json',
 			'Accept-Encoding': 'gzip, deflate, br',
-			'Authorization': jwt,
-			/*'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Headers': '*',
-			'Access-Control-Allow-Credentials': true,
-			'Access-Control-Allow-Methods': 'GET,DELETE,OPTIONS,PUT',
-			'Access-Control-Expose-Headers': '*',*/
+			'Authorization': "Bearer " +jwt,
 			'If-Match': etag
 		  }
 	}).then(res => console.log(res.json()))
 	.catch(error => console.error('Error:', error))
 	.then(response => console.log('Success:', response));
-	//requestPUT(products_path+idOfElementToEdit,response, "PUT", undefined);
 }
 
 function clickRadio(){
@@ -186,26 +176,22 @@ function clickRadio(){
 		typetxt = "product";
 		document.getElementById("participes").disabled = false;
 		document.getElementById("patrocinadores").disabled = false;
-		document.getElementById("apellido_input").disabled = true;
 		break;}
 		case "entity":{
 		typetxt = "entity";
 		document.getElementById("participes").disabled = false;
 		document.getElementById("patrocinadores").disabled = true;
-		document.getElementById("apellido_input").disabled = true;
 		break;}
 		default: { 
 		typetxt = "person";
 		document.getElementById("participes").disabled = true;
 		document.getElementById("patrocinadores").disabled = true;
-		document.getElementById("apellido_input").disabled = false;
 		}
 	}
 }
 
 function getDataInJSON(){
 	var nombretxt = document.getElementById("nombre_input").value;
-	var apellidotxt = getApellido();
 	var fechaCreaciontxt = document.getElementById("fecha_nac_input").value;
 	var fechaDefunciontxt = document.getElementById("fecha_def_input").value;
 	var participestxt = document.getElementById("participes").value;
@@ -216,21 +202,14 @@ function getDataInJSON(){
 
 	var json = {
 		id:"to_"+nombretxt,
-		nombre: nombretxt +" "+ apellidotxt,
-		fechaCreacion: fechaCreaciontxt,
-		fechaDefuncion: fechaDefunciontxt,
-		imagen: image,
-		wiki: wikitxt,
+		name: nombretxt,
+		birthDate: fechaCreaciontxt,
+		deathDate: fechaDefunciontxt,
+		imageUrl: image,
+		wikiUrl: wikitxt,
+		persons: null,
+		entities: null,
 		type: typetxt
 	};
 	return json;
-}
-
-function getApellido() {
-	var resul = document.getElementById("apellido_input").value;
-	if(resul !== undefined){
-		return resul;
-	} else {
-		return "";
-	}
 }
