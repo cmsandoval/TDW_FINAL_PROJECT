@@ -15,6 +15,8 @@ let product_delete_endpoint = "products/";
 let person_delete_endpoint = "persons/";
 let entity_delete_endpoint = "entities/";
 
+let users_endpoint = "users/";
+
 
 
 function onLoad() {
@@ -401,7 +403,18 @@ function closeNav() {
 }
 
 function checkUserName(){
-	
+	let input = document.getElementById('input_username').value;
+	console.log(input);
+	request(api_url+users_endpoint+"username/",input,checkUserNameResponse, 'GET', undefined );
+}
+
+function checkUserNameResponse(){
+	switch(httpRequest.status){
+		case 204:  alert("username already exists");
+		break;
+		case 404: alert("username is free");
+		break;
+	}
 }
 
 //Users
