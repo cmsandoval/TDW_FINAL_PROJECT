@@ -412,9 +412,22 @@ function checkUserNameResponse(){
 	switch(httpRequest.status){
 		case 204:  alert("username already exists");
 		break;
-		case 404: alert("username is free");
+		case 404: successUserNameCheck();
 		break;
 	}
+}
+
+function successUserNameCheck(){
+	let usernameInput = document.getElementById('input_username').value;
+	let passwordInput = document.getElementById('input_password').value;
+
+	let user = {
+		username: usernameInput,
+		password: passwordInput
+	}
+
+	window.localStorage.setItem("register", JSON.stringify(user));
+	window.location.href = "./register.html";
 }
 
 //Users
