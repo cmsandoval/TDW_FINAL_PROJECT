@@ -64,7 +64,7 @@ if(objectOfElementToDelete.length != 0){
 	data = newData;
 	console.log("Elementos restantes: " + newData);
 	window.localStorage.setItem("data", JSON.stringify(newData));
-	alert(nombre + " eliminado");
+	alert(nombre + " deleted");
 	window.location.reload();
 } else {
 	deleteElementFromAPI(this.name, this.value);
@@ -351,7 +351,7 @@ function showElements(item){
 	button.setAttribute("type", "submit");
 	button.classList.toggle("btn");
 	button.classList.toggle("btn-danger");
-	button.innerHTML = "Eliminar";
+	button.innerHTML = "Delete";
 
 	var aEdit = document.createElement("a");
 	aEdit.setAttribute("href", "./edit.html");
@@ -360,7 +360,7 @@ function showElements(item){
 	buttonEditar.setAttribute("type", "submit");
 	buttonEditar.classList.toggle("btn");
 	buttonEditar.classList.toggle("btn-warning");
-	buttonEditar.innerHTML = "Editar";
+	buttonEditar.innerHTML = "Edit";
 
 	aEdit.appendChild(buttonEditar);
 	p.appendChild(a);
@@ -388,20 +388,21 @@ function showElements(item){
 		}
 	}
 
+function openNav() {
+	document.getElementById("mySidenav").style.width = "250px";
+	document.getElementById("main").style.marginLeft = "250px";
+	  }
+	  
+	  /* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
+	  function closeNav() {
+		document.getElementById("mySidenav").style.width = "0";
+		document.getElementById("main").style.marginLeft = "0";
+	  }
+
 //Users
 let user1 = {
 	email : "user1@domain.com",
 	password: "user1@domain.com"
-};
-
-let user2 = {
-	email : "user2@domain.com",
-	password: "user2@domain.com"
-};
-
-let user3 = {
-	email : "user3@domain.com",
-	password: "user3@domain.com"
 };
 
 //DATA

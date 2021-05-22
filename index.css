@@ -1,0 +1,91 @@
+body {
+    padding: 10px;
+    margin-top:5%;
+}
+.row>.col, .row[class^="col-"]{
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    border: 1px solid rgba(39,41,43,0.1)
+}
+.thumbnail {
+    padding: 0 0 15px 0;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 20px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    display: block;
+    max-width: 100%;
+    height: auto;
+
+
+}
+.thumbnail p {
+    margin-top: 15px;
+}
+#btn_logout, #btn_create{
+    display: none;
+}
+#btn_create{
+    margin: 50px;
+}
+.badge {
+    width: inherit;
+    padding: 10px 20px;
+    transition: .2s;
+}
+.badge:hover{
+    border: 1px solid #333;
+    background-color: white;
+    color: white;
+}
+.btn-danger, .btn-warning {
+    display : none;
+    margin-right: 3px;
+}
+a:link, a:visited, a:active {
+    text-decoration:none;
+}
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+  }
+  
+  .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  .sidenav a:hover {
+    color: #f1f1f1;
+  }
+  
+  .sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+  
+  #main {
+    transition: margin-left .5s;
+    padding: 16px;
+  }
+  
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
