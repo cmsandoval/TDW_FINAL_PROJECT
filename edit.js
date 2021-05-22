@@ -164,9 +164,14 @@ function updateAPIService(assetEdited, idOfElementToEdit){
 			'Authorization': "Bearer " +jwt,
 			'If-Match': etag
 		  }
-	}).then(res => console.log(res.json()))
+	}).then(res => successRequest())
 	.catch(error => console.error('Error:', error))
 	.then(response => console.log('Success:', response));
+}
+
+function successRequest(){
+	alert("resource edited");
+	window.location.href = "./practica.html";
 }
 
 function clickRadio(){
