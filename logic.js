@@ -144,7 +144,7 @@ function showDeleteAndCreateButton() {
 		}
 		var boton = document.getElementById("btn_create");
 		boton.style.display = "initial";
-		console.log("boton esta " + boton.style.display);
+		enableUsersManagement();
 	}
 }
 
@@ -194,7 +194,7 @@ function checkLoginStatus() {
 	} else if (httpRequest.status === 401) {
 		alert("UNAUTHORIZED: invalid Authorization header");
 	} else {
-		let error = httpRequest.response;
+		let error = httpRequest.response.message;
 		alert(error);
 	}
 }
@@ -219,6 +219,11 @@ function successLogin() {
 	document.getElementById("btn_logout").style.display = "contents";
 	fetchElementsFromAPI();
 	showDeleteAndCreateButton();
+}
+
+function enableUsersManagement(){
+	document.getElementById('manage_user_modal').style.display = 'block';
+	document.getElementById('profile_modal').style.display = 'block';
 }
 
 function request(url, endpoint, response, method, params) {
