@@ -173,6 +173,8 @@ function getLogged() {
 function destroyLogged() {
 	window.localStorage.removeItem("userLogged");
 	window.localStorage.removeItem("jwt");
+	window.localStorage.removeItem("itemToEdit");
+	window.localStorage.removeItem("itemSelected");
 	window.location.reload();
 }
 function getForm() { return document.forms["login_form"] }
@@ -181,10 +183,8 @@ function doLogin() {
 	var formData = new FormData()
 	var email = getForm()["username"].value;
 	var pass = getForm()["password"].value;
-	var scope = getForm()["reader"].value + " " + getForm()["writer"].value;
 	formData.append("username", email);
 	formData.append("password", pass);
-	formData.append("scope", scope);
 	request(access_url, "access_token", checkLoginStatus, "POST", formData);
 }
 

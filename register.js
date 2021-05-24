@@ -72,5 +72,6 @@ function registerResponse(){
 
 function successRegistration(){
     alert("User registrated");
+    window.localStorage.removeItem("register");
     window.location.href = "./practica.html";
 }
