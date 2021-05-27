@@ -108,6 +108,28 @@ function successGetUsers(usersList) {
     });
 }
 
+function deleteUser() {
+   userId = this.value;
+}
+
+function deleteUserFromAPI(){
+    alert("se borrara el id "+ userId);
+    request(api_url,users_endpoint+"/"+userId,responseDeleteFromApi, 'DELETE', undefined )
+}
+
+function responseDeleteFromApi(){
+    switch(httpRequest.status){
+        case 204: alert("user deleted");
+        window.refere
+        break;
+        case 401: alert("invalid Authorization header");
+        break;
+        case 404: alert("resource not found");
+        break;
+    }
+    window.location.reload();
+}
+
 function showData(user) {
     let body = document.getElementById('table_body');
 
@@ -170,6 +192,19 @@ function showData(user) {
     buttonEditar.style.display = 'block';
     buttonEditar.addEventListener('click', getUserId);
 
+    var tdDeleteButton = document.createElement('td');
+    var buttonDelete = document.createElement("button");
+    buttonDelete.setAttribute("type", "button");
+    buttonDelete.setAttribute('value', user.id);
+    buttonDelete.addEventListener('click',deleteUser);
+    buttonDelete.setAttribute('data-bs-toggle', 'modal');
+    buttonDelete.setAttribute('data-bs-target', '#exampleModalCenter');
+
+    buttonDelete.classList.toggle("btn");
+    buttonDelete.classList.toggle("btn-danger");
+    buttonDelete.innerHTML = "Delete";
+    buttonDelete.style.display = 'block';
+
 
     divWriter.appendChild(labelWriter);
     divWriter.appendChild(inputWriter);
@@ -179,10 +214,12 @@ function showData(user) {
     divMain.appendChild(divReader);
     tdOptions.appendChild(divMain);
     tdEditButton.appendChild(buttonEditar);
+    tdDeleteButton.appendChild(buttonDelete);
     tr.appendChild(th);
     tr.appendChild(tdUserName);
     tr.appendChild(tdEmail);
     tr.appendChild(tdOptions);
     tr.appendChild(tdEditButton);
+    tr.appendChild(tdDeleteButton);
     body.appendChild(tr);
 }
