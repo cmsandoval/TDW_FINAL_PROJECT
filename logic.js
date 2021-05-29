@@ -153,8 +153,10 @@ function hideLogoutAndCreateButton() {
 	document.getElementById("btn_create").style.display = "none";
 }
 
-function saveLogged(email, pass, scopes) {
+function saveLogged(email, pass, scopes, userLogged) {
 	var userData = JSON.stringify({
+		"id": userLogged.id,
+		"username": userLogged.username,
 		"email": email,
 		"pass": pass,
 		"scope": scopes
@@ -212,7 +214,7 @@ function successLogin() {
 		scopes += scope + " ";
 	});
 	window.localStorage.setItem("jwt", jwt);
-	saveLogged(email, pass, scopes);
+	saveLogged(email, pass, scopes, response.user.user);
 	getForm()["username"].value = "";
 	getForm()["password"].value = "";
 	getForm().style.display = "none";
