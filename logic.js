@@ -202,9 +202,10 @@ function checkLoginStatus() {
 }
 
 function successLogin() {
+	var response = httpRequest.response;
+	if(response.user.user.active){
 	var email = getForm()["username"].value;
 	var pass = getForm()["password"].value;
-	var response = httpRequest.response;
 	var jwt = response.access_token;
 	var tokens = jwt.split(".");
 	var payLoad = JSON.parse(atob(tokens[1]));
@@ -221,6 +222,9 @@ function successLogin() {
 	document.getElementById("btn_logout").style.display = "contents";
 	fetchElementsFromAPI();
 	showDeleteAndCreateButton();
+} else {
+	alert("your profile is disabled");
+}
 }
 
 function enableUsersManagement(){

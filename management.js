@@ -113,7 +113,6 @@ function deleteUser() {
 }
 
 function deleteUserFromAPI(){
-    alert("se borrara el id "+ userId);
     request(api_url,users_endpoint+"/"+userId,responseDeleteFromApi, 'DELETE', undefined )
 }
 
@@ -192,6 +191,22 @@ function showData(user) {
     buttonEditar.style.display = 'block';
     buttonEditar.addEventListener('click', getUserId);
 
+    var tdDisableButton = document.createElement('td');
+    var divDisable = document.createElement('div');
+    divDisable.classList.toggle('form-check');
+    divDisable.classList.toggle('form-switch');
+    var input = document.createElement('input');
+    input.classList.toggle('form-check-input');
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('value', user.id);
+    input.addEventListener('change', switchEvent);
+    if(user.active){
+        input.setAttribute('checked', true);
+    }
+    var label = document.createElement('label');
+    label.innerHTML = "Inactive/Active";
+
+
     var tdDeleteButton = document.createElement('td');
     var buttonDelete = document.createElement("button");
     buttonDelete.setAttribute("type", "button");
@@ -205,7 +220,8 @@ function showData(user) {
     buttonDelete.innerHTML = "Delete";
     buttonDelete.style.display = 'block';
 
-
+    divDisable.appendChild(input);
+    divDisable.appendChild(label);
     divWriter.appendChild(labelWriter);
     divWriter.appendChild(inputWriter);
     divReader.appendChild(labelReader);
@@ -215,11 +231,53 @@ function showData(user) {
     tdOptions.appendChild(divMain);
     tdEditButton.appendChild(buttonEditar);
     tdDeleteButton.appendChild(buttonDelete);
+    tdDisableButton.appendChild(divDisable);
     tr.appendChild(th);
     tr.appendChild(tdUserName);
     tr.appendChild(tdEmail);
     tr.appendChild(tdOptions);
     tr.appendChild(tdEditButton);
     tr.appendChild(tdDeleteButton);
+    tr.appendChild(tdDisableButton);
     body.appendChild(tr);
+}
+
+function switchEvent(){
+    let jwt = window.localStorage.getItem("jwt");
+    let data = {
+        "active": this.checked,
+    }
+    fetch(api_url + users_endpoint + "/" + this.value, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt
+        }
+    }).then(res =>  disable(this.value, res.headers.get("etag"), data))
+       .then(response => console.log('Success:', response))
+        .catch(error => console.error('Error:', error));
+
+    
+    console.log("el "+ this.value +" esta " + this.checked);
+}
+
+function disable(id, etag, data){
+    let jwt = window.localStorage.getItem("jwt");
+
+    fetch(api_url + users_endpoint + "/" + id, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt,
+            'If-Match': etag,
+            'Sec-Fetch-Mode': 'cors'
+        }
+    }).then(res =>alert('Hecho'))
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('Success:', response));
 }
