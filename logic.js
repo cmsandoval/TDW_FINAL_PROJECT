@@ -359,7 +359,7 @@ function showElements(item) {
 	a.classList.toggle("text-uppercase");
 	a.classList.toggle("fs-6");
 	a.setAttribute('href', "detail.html");
-	a.setAttribute('target', "_blank");
+	a.setAttribute('target', "_self");
 
 	var button = document.createElement("button");
 	button.setAttribute("type", "submit");

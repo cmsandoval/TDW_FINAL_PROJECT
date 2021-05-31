@@ -22,6 +22,7 @@ function requestRegistration(){
     let form = new FormData();
     let inputPassword = document.getElementById('input_password').value;
     let inputEmail = document.getElementById('input_email').value;
+    let birthdate = document.getElementById('input_birthdate').value;
     let role;
     if(document.getElementById('input_reader').checked &&
     document.getElementById('input_writer').checked){
@@ -36,6 +37,7 @@ function requestRegistration(){
     form.append('password', inputPassword);
     form.append('email', inputEmail);
     form.append('role', role);
+    form.append('birthdate', birthdate);
 
     request(api_url,users_endpoint, registerResponse, 'POST', form);
 }
