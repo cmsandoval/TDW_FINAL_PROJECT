@@ -6,6 +6,7 @@ let httpRequest2 =
 let products_path = "products/";
 let persons_path = "persons/";
 let entities_path = "entities/";
+var item;
 
 function onLoad(){
 	getSelectedItem();
@@ -13,7 +14,7 @@ function onLoad(){
 }
 
 function getSelectedItem(){
-	var item = JSON.parse(window.localStorage.getItem("itemSelected"));
+	item = JSON.parse(window.localStorage.getItem("itemSelected"));
 	let itemSelected = setItemFromCache(item.id);
 	if(!itemSelected){
 		fetchItemFromApi(item.id, item.type);
@@ -22,7 +23,8 @@ function getSelectedItem(){
 
 function fetchItemFromApi(id, type){
 	switch(type){
-		case "product": request(products_path+id, response, "GET", undefined);
+		case "product": {
+			request(products_path+id, response, "GET", undefined);}
 		break;
 		case "person": request(persons_path+id, response, "GET",undefined);
 		break;
@@ -80,25 +82,25 @@ function getAllData(){
 		httpRequestEntities.setRequestHeader('Authorization', "Bearer " + jwt);
 	}
 
-	httpRequestPersons.send();
-	httpRequestProducts.send();
-	httpRequestEntities.send();
+	switch(item.type){
+		case "person": {
+			httpRequestProducts.send();
+			httpRequestEntities.send();}
+		break;
+		case "product": {
+			httpRequestPersons.send();
+			httpRequestEntities.send();
+		}
+		break;
+		case "entity": {
+			httpRequestPersons.send();
+			httpRequestProducts.send();
+		}
+		break;
+	}
 }
 
-function request(endpoint, response, method, params){
-	httpRequest.open(method,encodeURI(api_url+endpoint), true);
-	httpRequest.responseType = "json";
-	httpRequest.onload = response;
-	let jwt = window.localStorage.getItem("jwt");
-	if(jwt != null){
-		httpRequest.setRequestHeader('Authorization', "Bearer " + jwt);
-	}
-	if(params === undefined){
-		httpRequest.send();
-	} else {
-		httpRequest.send(params);
-	}
-}
+
 
 function request2(endpoint, response, method, params){
 	httpRequest2.open(method,encodeURI(api_url+endpoint), true);
@@ -115,6 +117,21 @@ function request2(endpoint, response, method, params){
 	}
 }
 
+function request3(endpoint, response, method, params){
+	httpRequest3.open(method,encodeURI(api_url+endpoint), true);
+	httpRequest3.responseType = "json";
+	httpRequest3.onload = response;
+	let jwt = window.localStorage.getItem("jwt");
+	if(jwt != null){
+		httpRequest3.setRequestHeader('Authorization', "Bearer " + jwt);
+	}
+	if(params === undefined){
+		httpRequest3.send();
+	} else {
+		httpRequest3.send(params);
+	}
+}
+
 function response(){
 	if(httpRequest.status === 200){
 		var response = getResponseField();
@@ -123,14 +140,16 @@ function response(){
 		setData(response);
 	} else if(httpRequest.status === 401){
 		alert("UNAUTHORIZED: invalid Authorization header");
-	} else {
+	} else if(httpRequest.status === 209){
+		console.log("resource updated");
+	}
+	else {
 		let error = httpRequest.response;
 		alert(error);
 	}
 }
 
 function requestRelations(){
-	var item = JSON.parse(window.localStorage.getItem("itemSelected"));
 	switch(item.type){
 		case "entity": requestRelationsEntity(item);
 		break;
@@ -232,6 +251,7 @@ function setCheckBoxes(type, object){
     input.setAttribute('type', 'checkbox');
 	input.setAttribute('name', type);
     input.setAttribute('value', object.id);
+	input.setAttribute('id', object.name);
     var label = document.createElement('label');
     label.classList.toggle('form-check-label');
     label.setAttribute('for', 'flexCheckDefault');
@@ -245,81 +265,227 @@ function setCheckBoxes(type, object){
 
 function checkBoxListener(){
 	console.log(this.value + " " + this.name);
+	
+		switch(item.type){
+			case "product": updateProductRelation(this.checked, this.value, this.name);
+			break;
+			case "entity": updateEntityRelation(this.checked, this.value, this.name);
+			break;
+			case "persons": updatePersonsRelation(this.checked, this.value, this.name);
+		}
+	
+
+}
+
+function updatePersonsRelation(checked, id, type){
+	if(checked){
+		switch(type){
+			case "entities": request(persons_path+item.id+ "/" + entities_path + "add/" + id, response, 'PUT', undefined);
+			break;
+			case "products": request(persons_path+item.id+ "/" + products_path + "add/" + id, response, 'PUT', undefined);
+			break;
+		}
+	} else {
+		switch(type){
+			case "entities": request(persons_path+item.id+ "/" + entities_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+			case "products": request(persons_path+item.id+ "/" + products_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+		}
+	}
+}
+
+function updateEntityRelation(checked, id, type){
+	if(checked){
+		switch(type){
+			case "products": request(entities_path+item.id+ "/" + products_path + "add/" + id, response, 'PUT', undefined);
+			break;
+			case "persons": request(entities_path+item.id+ "/" + persons_path + "add/" + id, response, 'PUT', undefined);
+			break;
+		}
+	} else {
+		switch(type){
+			case "products": request(entities_path+item.id+ "/" + products_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+			case "persons": request(entities_path+item.id+ "/" + products_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+		}
+	}
+}
+
+function updateProductRelation(checked, id, type){
+	if(checked){
+		switch(type){
+			case "entities": request(products_path+item.id+ "/" + entities_path + "add/" + id, response, 'PUT', undefined);
+			break;
+			case "persons": request(products_path+item.id+ "/" + persons_path + "add/" + id, response, 'PUT', undefined);
+			break;
+		}
+	} else {
+		switch(type){
+			case "entities": request(products_path+item.id+ "/" + entities_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+			case "persons": request(products_path+item.id+ "/" + persons_path + "rem/" + id, response, 'PUT', undefined);
+			break;
+		}
+	}
+}
+
+function request(endpoint, response, method, params){
+	httpRequest.open(method,encodeURI(api_url+endpoint), true);
+	httpRequest.responseType = "json";
+	httpRequest.onload = response;
+	let jwt = window.localStorage.getItem("jwt");
+	if(jwt != null){
+		httpRequest.setRequestHeader('Authorization', "Bearer " + jwt);
+	}
+	if(params === undefined){
+		httpRequest.send();
+	} else {
+		httpRequest.send(params);
+	}
 }
 
 //Relations for entities
 
 
 function requestRelationsEntity(item){
-	//request persons
-	request(entities_path + item.id + "/" + "persons", responseEntitiesPersons(item), "GET", undefined);
+	let jwt = window.localStorage.getItem("jwt");
+
+Promise.all([
+	fetch(api_url+entities_path + item.id + "/" + "products",
+	{
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt
+        }
+    }),
+	fetch(api_url+entities_path + item.id + "/" + "persons",
+	{
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt
+        }
+    })
+]).then(function(responses){
+	return Promise.all(responses.map(function (response){
+		return response.json();
+	}));
+}).then(function (data){
+	console.log(data);
+	setRelation(data);
+}).catch(function(error){
+	console.log(error);
+});
 }
 
-function responseEntitiesPersons(item){
-	if(httpRequest.status === 200){
-		//request products
-		console.log(httpRequest.response);
-		request2(entities_path + item.id + "/" + "products", responseEntitiesProducts, 'GET', undefined);
-	} else {
-		console.log(httpRequest.response);
-	}
+function setRelation(data){
+	data.forEach((it) => {
+		if(it.products != null){
+			it.products.forEach((item) => {
+				console.log(item.product);
+				setChecked(item.product);
+			})
+		} else if(it.persons != null){
+			it.persons.forEach((item) => {
+				console.log(item.person);
+				setChecked(item.person);
+			})
+		} else if(it.entities != null){
+			it.entities.forEach((item) => {
+				console.log(item.entity);
+				setChecked(item.entity);
+			})
+		}
+	})
 }
 
-function responseEntitiesProducts(){
-	if(httpRequest2.status === 200){
-		console.log(httpRequest2.response);
-	} else {
-		console.log(httpRequest2.response);
+function setChecked(object){
+	var checkbox = document.getElementById(object.name);
+	if(checkbox != undefined){
+		checkbox.checked = true;
 	}
 }
 
 //Relations for products
 
 function requestRelationsProduct(item){
-//request entities
-request(products_path + item.id + "/" + "entities", responseProductsEntities(item), "GET", undefined);
-}
+let jwt = window.localStorage.getItem("jwt");
 
-function responseProductsEntities(item){
-	if(httpRequest.status === 200){
-		//request persons
-		console.log(httpRequest.response);
-		request2(products_path + item.id + "/" + "persons", responseProductsPersons(item), 'GET', undefined);
-	} else {
-		console.log(httpRequest.response);
-	}
-}
+Promise.all([
+	fetch(api_url+products_path + item.id + "/" + "entities",
+	{
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt
+        }
+    }),
+	fetch(api_url+products_path + item.id + "/" + "persons",
+	{
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Authorization': "Bearer " + jwt
+        }
+    })
+]).then(function(responses){
+	return Promise.all(responses.map(function (response){
+		return response.json();
+	}));
+}).then(function (data){
+	console.log(data);
+	setRelation(data);
+}).catch(function(error){
+	console.log(error);
+});
 
-function responseProductsPersons(item){
-	if(httpRequest2.status === 200){
-		console.log(httpRequest2.response);
-	} else {
-		console.log(httpRequest2.response);
-	}
 }
 
 //Relations for persons
 
 function requestRelationsPerson(item){
-//request entities
-request(persons_path + item.id + "/" + "entities", responsePersonsEntities(item), "GET", undefined);
+	let jwt = window.localStorage.getItem("jwt");
 
-}
-
-function responsePersonsEntities(item){
-	if(httpRequest.status === 200){
-		//request products
-		console.log(httpRequest.response);
-		request2(persons_path + item.id + "/" + "products", responsePersonsProducts(item), 'GET', undefined);
-	} else {
-		console.log(httpRequest.response);
-	}
-}
-
-function responsePersonsProducts(item){
-	if(httpRequest2.status === 200){
-		console.log(httpRequest2.response);
-	} else {
-		console.log(httpRequest2.response);
-	}
+	Promise.all([
+		fetch(api_url+persons_path + item.id + "/" + "entities",
+		{
+			method: 'GET',
+			headers: {
+				'accept': 'application/json',
+				'Content-Type': 'application/json',
+				'Accept-Encoding': 'gzip, deflate, br',
+				'Authorization': "Bearer " + jwt
+			}
+		}),
+		fetch(api_url+persons_path + item.id + "/" + "products",
+		{
+			method: 'GET',
+			headers: {
+				'accept': 'application/json',
+				'Content-Type': 'application/json',
+				'Accept-Encoding': 'gzip, deflate, br',
+				'Authorization': "Bearer " + jwt
+			}
+		})
+	]).then(function(responses){
+		return Promise.all(responses.map(function (response){
+			return response.json();
+		}));
+	}).then(function (data){
+		console.log(data);
+		setRelation(data);
+	}).catch(function(error){
+		console.log(error);
+	});
 }
