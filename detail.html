@@ -20,6 +20,11 @@
 		#btn_index{
 			padding-left: 0.3%;
 		}
+		footer {
+			 padding: 10px;
+			 padding-left: 6%;
+			 margin : 0.5%;
+			}
 	</style>
 </head>
 <body onload="onLoad();">
@@ -28,10 +33,10 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="row ">
-						<h1 id="title" class="fw-light fs-1 text-center ">TITULO</h1>	
-						<div id="btn_index" class="d-flex" ">
+						<h1 id="title" class="fw-light fs-1 text-center ">TITLE</h1>	
+						<div id="btn_index" class="d-flex">
 							<form action="./practica.html">
-								<button  type="submit" class="btn btn-outline-success mr-auto p-2">Volver al &iacutendice</button>
+								<button  type="submit" class="btn btn-outline-success mr-auto p-2">Return home</button>
 							</form>
 							
 						</div>
@@ -41,20 +46,21 @@
 						<img id="image" alt="image">
 						<br/>
 					</div>
-					<div>		
-						<div id="main_div" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
-							<h3>Algunos datos interesantes:</h3>
+					<div id="main_div">		
+						<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+							<h3>Some interesting information:</h3>
 							<ul id="dates_list">
 												 					 
 							</ul>
-							<blockquote id="parrafo">
-							</blockquote>
-							<h3>Si quieres saber mas... <a id="wiki" href="https://en.wikipedia.org/wiki/Werner_Heisenberg">Wikipedia</a></h3>
+							<blockquote id="parrafo">Resources related:</blockquote>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>  
+	<footer>
+		<h3>For further information visit... <a id="wiki" href="https://en.wikipedia.org/wiki/Werner_Heisenberg">Wikipedia</a></h3>
+	</footer>
 </body>
 </html>

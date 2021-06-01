@@ -277,7 +277,7 @@ function disable(id, etag, data){
             'If-Match': etag,
             'Sec-Fetch-Mode': 'cors'
         }
-    }).then(res =>alert('Hecho'))
+    }).then(res =>console.log('updated'))
         .catch(error => console.error('Error:', error))
         .then(response => console.log('Success:', response));
 }

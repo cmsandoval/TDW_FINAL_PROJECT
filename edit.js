@@ -90,6 +90,7 @@ function setData(item){
 	document.getElementById("nombre_input").value = item.name;
 	document.getElementById("fecha_nac_input").value = item.birthDate;
 	document.getElementById("fecha_def_input").value = item.deathDate;
+	
 	var creadores = "";
 	if(item.persons != null){
 		item.persons.forEach((creador) =>{
@@ -104,8 +105,8 @@ function setData(item){
 			patrocinadores = patrocinadores + patrocinador + " ";
 		});
 	}
-
 	document.getElementById("patrocinadores").value = patrocinadores;
+
 	document.getElementById("wiki").value = item.wikiUrl;
 	document.getElementById("url_Image").value = item.imageUrl;
 

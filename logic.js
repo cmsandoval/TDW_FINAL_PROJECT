@@ -67,7 +67,6 @@ function deleteClicked() {
 		data = newData;
 		console.log("Elementos restantes: " + newData);
 		window.localStorage.setItem("data", JSON.stringify(newData));
-		alert(nombre + " deleted");
 		window.location.reload();
 	} else {
 		deleteElementFromAPI(this.name, this.value);
@@ -87,7 +86,7 @@ function deleteElementFromAPI(id, type) {
 
 function responseDeleteFromAPI() {
 	if (httpRequest.status === 204) {
-		alert("Product deleted");
+		alert("Deleted");
 		window.location.reload();
 	} else if (httpRequest.status === 401) {
 		alert("UNAUTHORIZED: invalid Authorization header");
@@ -135,6 +134,7 @@ function logout(event, button) {
 function showDeleteAndCreateButton() {
 	let data = window.localStorage.getItem("userLogged");
 	let userLogged = JSON.parse(data);
+	document.getElementById('profile_modal').style.display = 'block';
 	if (userLogged.scope.includes('writer')) {
 		for (let deleteButton of document.getElementsByClassName("btn-danger")) {
 			deleteButton.style.display = "initial";
@@ -229,7 +229,6 @@ function successLogin() {
 
 function enableUsersManagement(){
 	document.getElementById('manage_user_modal').style.display = 'block';
-	document.getElementById('profile_modal').style.display = 'block';
 }
 
 function request(url, endpoint, response, method, params) {
